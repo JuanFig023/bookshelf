@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum Format {
+  HARDCOVER
+  PAPERBACK
+  AUDIOBOOK
+  EBOOK
+  CD
+}
+
+enum Status {
+  ACTIVE
+  RETURNED
+  OVERDUE
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// Models
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  role         Role       @default(USER)
+  checkouts    Checkout[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Book {
+  id          String    @id @default(uuid())
+  title       String
+  author      String
+  isbn        String?   @unique
+  description String?
+  coverImage  String?
+  genre       String?
+  editions    Edition[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Edition {
+  id          String     @id @default(uuid())
+  bookId      String
+  book        Book       @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  format      Format     @default(PAPERBACK)
+  publisher   String?
+  year        Int?
+  totalCopies Int        @default(1)
+  checkouts   Checkout[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([bookId])
+}
+
+model Checkout {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  editionId    String
+  edition      Edition   @relation(fields: [editionId], references: [id])
+  checkoutDate DateTime  @default(now())
+  dueDate      DateTime
+  returnDate   DateTime?
+  status       Status    @default(ACTIVE)
+  renewCount   Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([editionId])
+  @@index([status])
+}

@@ -1,0 +1,147 @@
+# Enums
+enum Format {
+  HARDCOVER
+  PAPERBACK
+  AUDIOBOOK
+  EBOOK
+  CD
+}
+
+enum Status {
+  ACTIVE
+  RETURNED
+  OVERDUE
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+# Types
+type Book {
+  id: ID!
+  title: String!
+  author: String!
+  isbn: String
+  description: String
+  coverImage: String
+  genre: String
+  editions: [Edition!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Edition {
+  id: ID!
+  bookId: ID!
+  book: Book!
+  format: Format!
+  publisher: String
+  year: Int
+  totalCopies: Int!
+  availableCopies: Int!
+  checkouts: [Checkout!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  role: Role!
+  checkouts: [Checkout!]!
+  createdAt: String!
+}
+
+type Checkout {
+  id: ID!
+  userId: ID!
+  user: User!
+  editionId: ID!
+  edition: Edition!
+  checkoutDate: String!
+  dueDate: String!
+  returnDate: String
+  status: Status!
+  renewCount: Int!
+  createdAt: String!
+}
+
+# Auth Types
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+# Queries
+type Query {
+  # Book queries
+  books: [Book!]!
+  book(id: ID!): Book
+  
+  # Edition queries
+  editions: [Edition!]!
+  edition(id: ID!): Edition
+  
+  # User queries
+  me: User
+  
+  # Checkout queries
+  myCheckouts: [Checkout!]!
+}
+
+# Mutations
+type Mutation {
+  # Auth mutations
+  register(email: String!, password: String!, name: String!): AuthPayload!
+  login(email: String!, password: String!): AuthPayload!
+  logout: Boolean!
+  
+  # Book mutations
+  createBook(
+    title: String!
+    author: String!
+    isbn: String
+    description: String
+    coverImage: String
+    genre: String
+  ): Book!
+  
+  updateBook(
+    id: ID!
+    title: String
+    author: String
+    isbn: String
+    description: String
+    coverImage: String
+    genre: String
+  ): Book!
+  
+  deleteBook(id: ID!): Boolean!
+  
+  # Edition mutations
+  createEdition(
+    bookId: ID!
+    format: Format!
+    publisher: String
+    year: Int
+    totalCopies: Int!
+  ): Edition!
+  
+  updateEdition(
+    id: ID!
+    format: Format
+    publisher: String
+    year: Int
+    totalCopies: Int
+  ): Edition!
+  
+  deleteEdition(id: ID!): Boolean!
+  
+  # Checkout mutations
+  checkoutEdition(editionId: ID!): Checkout!
+  returnCheckout(checkoutId: ID!): Checkout!
+  renewCheckout(checkoutId: ID!): Checkout!
+}
