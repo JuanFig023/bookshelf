@@ -8,6 +8,7 @@ import { join } from 'path';
 import dotenv from 'dotenv';
 import { resolvers } from './resolvers';
 import { prisma } from './db';
+import { verifyToken } from './utils/auth';
 
 dotenv.config();
 
@@ -25,6 +26,8 @@ export interface Context {
     email: string;
     role: string;
   };
+  req?: any;
+  res?: any;
 }
 
 async function startServer() {
@@ -49,9 +52,24 @@ async function startServer() {
     '/graphql',
     expressMiddleware(server, {
       context: async ({ req, res }) => {
-        // TODO: Extract user from JWT cookie (we'll add this when implementing auth)
+        // Extract JWT from cookie
+        const token = req.cookies?.token;
+        
+        let user = undefined;
+        if (token) {
+          const payload = verifyToken(token);
+          if (payload) {
+            user = {
+              id: payload.userId,
+              email: payload.email,
+              role: payload.role,
+            };
+          }
+        }
+
         return {
           prisma,
+          user,
           req,
           res,
         };

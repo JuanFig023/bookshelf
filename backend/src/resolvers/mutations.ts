@@ -1,15 +1,111 @@
 import { Context } from '../index';
+import { hashPassword, comparePassword, generateToken } from '../utils/auth';
 
 export const Mutation = {
-  // Auth mutations (placeholders for now)
-  register: async () => {
-    throw new Error('Not implemented yet');
+  // Auth mutations
+  register: async (
+    _: any,
+    { email, password, name }: { email: string; password: string; name: string },
+    { prisma, res }: any
+  ) => {
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      throw new Error('User with this email already exists');
+    }
+
+    // Hash password
+    const passwordHash = await hashPassword(password);
+
+    // Create user
+    const user = await prisma.user.create({
+      data: {
+        email,
+        passwordHash,
+        name,
+        role: 'USER',
+      },
+    });
+
+    // Generate JWT
+    const token = generateToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    // Set httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+    };
   },
-  login: async () => {
-    throw new Error('Not implemented yet');
+
+  login: async (
+    _: any,
+    { email, password }: { email: string; password: string },
+    { prisma, res }: any
+  ) => {
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new Error('Invalid email or password');
+    }
+
+    // Verify password
+    const valid = await comparePassword(password, user.passwordHash);
+
+    if (!valid) {
+      throw new Error('Invalid email or password');
+    }
+
+    // Generate JWT
+    const token = generateToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    // Set httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+    };
   },
-  logout: async () => {
-    throw new Error('Not implemented yet');
+
+  logout: async (_: any, __: any, { res }: any) => {
+    res.clearCookie('token');
+    return true;
   },
 
   // Book mutations
@@ -89,14 +185,137 @@ export const Mutation = {
     return true;
   },
 
-  // Checkout mutations (placeholders)
-  checkoutEdition: async () => {
-    throw new Error('Not implemented yet');
+  // Checkout mutations
+  checkoutEdition: async (
+    _: any,
+    { editionId }: { editionId: string },
+    { prisma, user }: Context
+  ) => {
+    // Validate user is authenticated
+    if (!user) {
+      throw new Error('You must be logged in to checkout a book');
+    }
+
+    // Check if user has less than 5 active checkouts
+    const activeCheckouts = await prisma.checkout.count({
+      where: {
+        userId: user.id,
+        status: 'ACTIVE',
+      },
+    });
+
+    if (activeCheckouts >= 5) {
+      throw new Error('You have reached the maximum of 5 active checkouts');
+    }
+
+    // Check if edition has available copies
+    const edition = await prisma.edition.findUnique({
+      where: { id: editionId },
+      include: {
+        checkouts: {
+          where: {
+            status: 'ACTIVE',
+          },
+        },
+      },
+    });
+
+    if (!edition) {
+      throw new Error('Edition not found');
+    }
+
+    const availableCopies = edition.totalCopies - edition.checkouts.length;
+
+    if (availableCopies <= 0) {
+      throw new Error('No copies available for checkout');
+    }
+
+    // Create checkout with dueDate = today + 14 days
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 14);
+
+    return prisma.checkout.create({
+      data: {
+        userId: user.id,
+        editionId,
+        dueDate,
+        status: 'ACTIVE',
+      },
+    });
   },
-  returnCheckout: async () => {
-    throw new Error('Not implemented yet');
+  returnCheckout: async (
+    _: any,
+    { checkoutId }: { checkoutId: string },
+    { prisma, user }: Context
+  ) => {
+    // Validate user is authenticated
+    if (!user) {
+      throw new Error('You must be logged in to return a book');
+    }
+
+    // Find checkout
+    const checkout = await prisma.checkout.findUnique({
+      where: { id: checkoutId },
+    });
+
+    if (!checkout) {
+      throw new Error('Checkout not found');
+    }
+
+    // Validate user owns this checkout
+    if (checkout.userId !== user.id) {
+      throw new Error('You can only return your own checkouts');
+    }
+
+    // Update checkout with return date and status
+    return prisma.checkout.update({
+      where: { id: checkoutId },
+      data: {
+        returnDate: new Date(),
+        status: 'RETURNED',
+      },
+    });
   },
-  renewCheckout: async () => {
-    throw new Error('Not implemented yet');
+  renewCheckout: async (
+    _: any,
+    { checkoutId }: { checkoutId: string },
+    { prisma, user }: Context
+  ) => {
+    // Validate user is authenticated
+    if (!user) {
+      throw new Error('You must be logged in to renew a checkout');
+    }
+
+    // Find checkout
+    const checkout = await prisma.checkout.findUnique({
+      where: { id: checkoutId },
+    });
+
+    if (!checkout) {
+      throw new Error('Checkout not found');
+    }
+
+    // Validate user owns this checkout
+    if (checkout.userId !== user.id) {
+      throw new Error('You can only renew your own checkouts');
+    }
+
+    // Validate renewCount < 2
+    if (checkout.renewCount >= 2) {
+      throw new Error('You have reached the maximum of 2 renewals for this checkout');
+    }
+
+    // Extend dueDate by 14 days
+    const newDueDate = new Date(checkout.dueDate);
+    newDueDate.setDate(newDueDate.getDate() + 14);
+
+    // Update checkout
+    return prisma.checkout.update({
+      where: { id: checkoutId },
+      data: {
+        dueDate: newDueDate,
+        renewCount: checkout.renewCount + 1,
+      },
+    });
   },
 };
