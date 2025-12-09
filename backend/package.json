@@ -5,9 +5,11 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "start": "node dist/index.js",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node prisma/seed.ts",
+    "postinstall": "prisma generate",
+    "deploy": "prisma migrate deploy && npm run seed"
   },
   "keywords": [
     "graphql",
