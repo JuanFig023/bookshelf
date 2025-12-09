@@ -39,9 +39,10 @@ export const Mutation = {
 
     // Set httpOnly cookie
     res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      httpOnly: false,
+      secure: false,
       sameSite: 'lax',
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -86,9 +87,10 @@ export const Mutation = {
 
     // Set httpOnly cookie
     res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      httpOnly: false,
+      secure: false,
       sameSite: 'lax',
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -104,7 +106,7 @@ export const Mutation = {
   },
 
   logout: async (_: any, __: any, { res }: any) => {
-    res.clearCookie('token');
+    res.clearCookie('token', { path: '/' });
     return true;
   },
 
@@ -138,6 +140,29 @@ export const Mutation = {
   },
 
   deleteBook: async (_: any, { id }: { id: string }, { prisma }: Context) => {
+    // First, get all editions for this book
+    const editions = await prisma.edition.findMany({
+      where: { bookId: id },
+      select: { id: true },
+    });
+
+    // Delete all checkouts for these editions
+    if (editions.length > 0) {
+      await prisma.checkout.deleteMany({
+        where: {
+          editionId: {
+            in: editions.map(e => e.id),
+          },
+        },
+      });
+
+      // Delete all editions
+      await prisma.edition.deleteMany({
+        where: { bookId: id },
+      });
+    }
+
+    // Finally, delete the book
     await prisma.book.delete({
       where: { id },
     });

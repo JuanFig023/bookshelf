@@ -52,4 +52,20 @@ export const Checkout = {
       where: { id: parent.editionId },
     });
   },
+
+  checkoutDate: (parent: any) => {
+    return parent.checkoutDate ? new Date(parent.checkoutDate).toISOString() : null;
+  },
+
+  dueDate: (parent: any) => {
+    return parent.dueDate ? new Date(parent.dueDate).toISOString() : null;
+  },
+
+  returnDate: (parent: any) => {
+    return parent.returnDate ? new Date(parent.returnDate).toISOString() : null;
+  },
+
+  createdAt: (parent: any) => {
+    return parent.createdAt ? new Date(parent.createdAt).toISOString() : null;
+  },
 };
