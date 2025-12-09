@@ -26,12 +26,12 @@ A modern, full-stack library management system built with React, GraphQL, and Po
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 19.2.0** - Modern UI library
-- **Vite** - Lightning-fast build tool
+- **React 19.2.0**
+- **Vite**
 - **Apollo Client 3.14.0** - GraphQL client for data fetching
 - **React Router DOM 7.10.1** - Client-side routing
 - **Tailwind CSS** - Utility-first styling
-- **shadcn/ui** - Beautiful, accessible component library
+- **shadcn/ui** - Component library
 - **Lucide React** - Icon library
 
 ### Backend
@@ -62,15 +62,12 @@ A modern, full-stack library management system built with React, GraphQL, and Po
    cd backend
    npm install
    
-   # Create .env file with the following:
-   # DATABASE_URL="postgresql://user:password@localhost:5432/bookshelf"
-   # JWT_SECRET="your-secret-key-here"
-   # PORT=4000
+   # Create .env file with the following the example.env file:
    
    # Run database migrations
    npx prisma migrate dev
    
-   # Seed the database with sample data (15 books, 45 editions, 2 users)
+   # Seed the database with sample data
    npm run seed
    
    # Start the backend server
@@ -101,43 +98,6 @@ After seeding, you can login with:
 **Test User Account:**
 - Email: `test@library.com`
 - Password: `password123`
-
-## 📁 Project Structure
-
-```
-bookshelf/
-├── backend/
-│   ├── prisma/
-│   │   ├── schema.prisma      # Database schema
-│   │   └── seed.ts            # Sample data seeder
-│   ├── src/
-│   │   ├── resolvers/         # GraphQL resolvers
-│   │   │   ├── queries.ts
-│   │   │   ├── mutations.ts
-│   │   │   └── fieldResolvers.ts
-│   │   ├── schema.graphql     # GraphQL type definitions
-│   │   ├── context.ts         # GraphQL context (auth)
-│   │   └── index.ts           # Server entry point
-│   └── package.json
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/        # Reusable UI components
-│   │   │   ├── NavBar.jsx
-│   │   │   ├── TopBar.jsx
-│   │   │   └── ui/            # shadcn/ui components
-│   │   ├── pages/             # Route pages
-│   │   │   ├── HomePage.jsx
-│   │   │   ├── BookPage.jsx
-│   │   │   ├── MyCheckoutsPage.jsx
-│   │   │   ├── AdminPage.jsx
-│   │   │   └── LoginPage.jsx
-│   │   ├── App.jsx            # Main app component
-│   │   └── main.jsx           # Entry point
-│   └── package.json
-│
-└── README.md
-```
 
 ## 🔐 Authentication & Security
 
@@ -174,16 +134,12 @@ bookshelf/
 ### Backend
 ```bash
 npm run dev       # Start development server with hot reload
-npm run build     # Build for production
-npm start         # Start production server
 npm run seed      # Seed database with sample data
 ```
 
 ### Frontend
 ```bash
 npm run dev       # Start Vite development server
-npm run build     # Build for production
-npm run preview   # Preview production build
 ```
 
 ## 📝 GraphQL API
@@ -225,21 +181,6 @@ npm run preview   # Preview production build
 2. Build command: `npm run build`
 3. Output directory: `dist`
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
 ## 📄 License
 
 This project is licensed under the MIT License.
-
-## 👤 Author
-
-**Juan Figueroa**
-- GitHub: [@JuanFig023](https://github.com/JuanFig023)
-
-## 🙏 Acknowledgments
-
-- [shadcn/ui](https://ui.shadcn.com/) for the beautiful component library
-- [Unsplash](https://unsplash.com/) for book cover images
-- Apprenticeship program for project guidance
