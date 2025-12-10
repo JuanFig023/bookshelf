@@ -44,8 +44,8 @@ async function startServer() {
     'http://localhost:5173',
     'http://127.0.0.1:5173',
     process.env.FRONTEND_URL, // Railway frontend URL
-  ].filter(Boolean); // Remove undefined values
-  
+  ].filter((origin): origin is string => Boolean(origin)); // Remove undefined values
+
   app.use(cors({
     origin: allowedOrigins,
     credentials: true,
