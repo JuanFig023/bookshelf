@@ -106,7 +106,11 @@ export const Mutation = {
   },
 
   logout: async (_: any, __: any, { res }: any) => {
-    res.clearCookie('token', { path: '/' });
+    res.clearCookie('token', { 
+      path: '/',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    });
     return true;
   },
 
