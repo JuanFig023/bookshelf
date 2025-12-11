@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useMutation, gql, useApolloClient } from '@apollo/client';
-import { useNavigate } from 'react-router-dom';
+import { useMutation, gql } from '@apollo/client';
 
 const REGISTER_MUTATION = gql`
   mutation Register($email: String!, $password: String!, $name: String!) {
@@ -27,8 +26,6 @@ const LOGIN_MUTATION = gql`
 `;
 
 function LoginPage() {
-  const navigate = useNavigate();
-  const apolloClient = useApolloClient();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ email: '', password: '', name: '' });
   const [error, setError] = useState('');
