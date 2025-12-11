@@ -64,7 +64,7 @@ A modern, full-stack library management system built with React, GraphQL, and Po
    cd backend
    npm install
    
-   # Create .env file with the following the example.env file:
+   # Create .env file with the following the .env.example file:
    
    # Run database migrations
    npx prisma migrate dev
