@@ -164,25 +164,6 @@ npm run dev       # Start Vite development server
 - `createEdition(...)` - Admin: Add edition to book
 - `deleteEdition(id)` - Admin: Remove edition
 
-## 🚀 Deployment
-
-### Backend Deployment (Railway/Render)
-1. Set environment variables:
-   - `DATABASE_URL` - PostgreSQL connection string
-   - `JWT_SECRET` - Secret key for tokens
-   - `PORT` - Server port (default: 4000)
-   - `NODE_ENV` - Set to "production"
-
-2. Build command: `npm run build`
-3. Start command: `npm start`
-
-### Frontend Deployment (Vercel/Netlify)
-1. Set environment variable:
-   - `VITE_API_URL` - Backend GraphQL endpoint
-
-2. Build command: `npm run build`
-3. Output directory: `dist`
-
 ## 📄 License
 
 This project is licensed under the MIT License.
