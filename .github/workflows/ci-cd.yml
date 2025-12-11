@@ -72,17 +72,21 @@ jobs:
         working-directory: ./backend
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: 5895d51f-21ad-4d49-991a-aeeeafb2ddec
+          RAILWAY_SERVICE: bookshelf
         run: |
           export PATH="/home/runner/.railway/bin:$PATH"
-          railway up --service=bookshelf --project=5895d51f-21ad-4d49-991a-aeeeafb2ddec
+          railway up
 
       - name: Deploy Frontend to Railway
         working-directory: ./frontend
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: 5895d51f-21ad-4d49-991a-aeeeafb2ddec
+          RAILWAY_SERVICE: cooperative-youth
         run: |
           export PATH="/home/runner/.railway/bin:$PATH"
-          railway up --service=cooperative-youth --project=5895d51f-21ad-4d49-991a-aeeeafb2ddec
+          railway up
 
       - name: Deployment Complete
         run: echo "🚀 Successfully deployed to Railway!"
