@@ -8,6 +8,8 @@
     "build": "prisma generate && tsc && node -e \"require('fs').copyFileSync('src/schema.graphql', 'dist/schema.graphql')\"",
     "start": "node dist/index.js",
     "seed": "ts-node prisma/seed.ts",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
     "postinstall": "prisma generate",
     "deploy": "prisma migrate deploy && npm run seed"
   },
@@ -37,6 +39,9 @@
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
     "nodemon": "^3.0.3",
     "prisma": "^5.22.0",
     "ts-node": "^10.9.2",
