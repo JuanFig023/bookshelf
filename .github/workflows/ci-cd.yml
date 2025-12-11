@@ -65,25 +65,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js for Railway CLI
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Railway CLI
-        run: npm install -g @railwayapp/cli
-
       - name: Deploy Backend to Railway
-        working-directory: ./backend
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service bookshelf
+        uses: railwayapp/railway-deploy@v1
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: bookshelf
+          working_directory: ./backend
 
       - name: Deploy Frontend to Railway
-        working-directory: ./frontend
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service cooperative-youth
+        uses: railwayapp/railway-deploy@v1
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: cooperative-youth
+          working_directory: ./frontend
 
       - name: Deployment Complete
         run: echo "🚀 Successfully deployed to Railway!"
