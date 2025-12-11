@@ -64,15 +64,18 @@ jobs:
     steps:
       - name: Trigger Backend Deployment
         run: |
-          curl -X POST https://api.railway.app/project/${{ secrets.RAILWAY_PROJECT_ID }}/service/bookshelf/deploy \
+          curl -X POST https://backboard.railway.app/graphql/v2 \
             -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
-            -H "Content-Type: application/json"
+            -H "Content-Type: application/json" \
+            -d '{"query":"mutation { serviceInstanceRedeploy(serviceId: \"651df9af-546b-44f0-a342-ab2c168bc9a4\", environmentId: \"96b577d4-72b9-423e-a75f-3fac1e8d6e50\") }"}'
 
       - name: Trigger Frontend Deployment
         run: |
-          curl -X POST https://api.railway.app/project/${{ secrets.RAILWAY_PROJECT_ID }}/service/cooperative-youth/deploy \
+          curl -X POST https://backboard.railway.app/graphql/v2 \
             -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
-            -H "Content-Type: application/json"
+            -H "Content-Type: application/json" \
+            -d '{"query":"mutation { serviceInstanceRedeploy(serviceId: \"5940f340-6179-44dd-958a-14583d7631c6\", environmentId: \"96b577d4-72b9-423e-a75f-3fac1e8d6e50\") }"}'
 
       - name: Deployment Complete
         run: echo "🚀 Triggered Railway deployments!"
+
