@@ -54,7 +54,7 @@ jobs:
       - name: CI Pipeline Complete
         run: echo "✅ All checks passed - Code is ready for deployment!"
 
-  # CD Job - Deploy to Railway
+  # CD Job - Trigger Railway Deployment
   cd:
     name: Continuous Deployment
     needs: ci
@@ -62,22 +62,17 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Trigger Backend Deployment
+        run: |
+          curl -X POST https://api.railway.app/project/${{ secrets.RAILWAY_PROJECT_ID }}/service/bookshelf/deploy \
+            -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+            -H "Content-Type: application/json"
 
-      - name: Deploy Backend to Railway
-        uses: railwayapp/railway-deploy@v1
-        with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: bookshelf
-          working_directory: ./backend
-
-      - name: Deploy Frontend to Railway
-        uses: railwayapp/railway-deploy@v1
-        with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: cooperative-youth
-          working_directory: ./frontend
+      - name: Trigger Frontend Deployment
+        run: |
+          curl -X POST https://api.railway.app/project/${{ secrets.RAILWAY_PROJECT_ID }}/service/cooperative-youth/deploy \
+            -H "Authorization: Bearer ${{ secrets.RAILWAY_TOKEN }}" \
+            -H "Content-Type: application/json"
 
       - name: Deployment Complete
-        run: echo "🚀 Successfully deployed to Railway!"
+        run: echo "🚀 Triggered Railway deployments!"
