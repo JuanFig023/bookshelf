@@ -74,8 +74,7 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           export PATH="/home/runner/.railway/bin:$PATH"
-          railway link fabulous-consideration
-          railway up --service bookshelf
+          railway up --service=bookshelf --project=5895d51f-21ad-4d49-991a-aeeeafb2ddec
 
       - name: Deploy Frontend to Railway
         working-directory: ./frontend
@@ -83,8 +82,7 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           export PATH="/home/runner/.railway/bin:$PATH"
-          railway link fabulous-consideration
-          railway up --service cooperative-youth
+          railway up --service=cooperative-youth --project=5895d51f-21ad-4d49-991a-aeeeafb2ddec
 
       - name: Deployment Complete
         run: echo "🚀 Successfully deployed to Railway!"
